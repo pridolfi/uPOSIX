@@ -57,8 +57,7 @@
 
 /*==================[inclusions]=============================================*/
 
-#include "uposix.h"
-#include <stdio.h>
+#include "app_blinky_lpc4337.h"
 
 /*==================[macros and definitions]=================================*/
 

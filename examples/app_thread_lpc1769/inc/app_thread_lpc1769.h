@@ -30,9 +30,10 @@
  *
  */
 
-/** @brief uposix_app_thread.c source file
- **
- ** This file demonstrates how to use uPOSIX library for LPCXpresso/LPC1769.
+#ifndef APP_THREAD_LPC1769_H_
+#define APP_THREAD_LPC1769_H_
+
+/** @brief Application main header file.
  **
  **/
 
@@ -40,9 +41,8 @@
  ** @{ */
 /** \addtogroup Examples Examples
  ** @{ */
-/** \addtogroup app1769 Simple thread management application for LPCXpresso/LPC1769 port.
+/** \addtogroup app1769 Simple thread application for LPCXpresso/LPC1769 port.
  ** @{ */
-
 /*
  * Initials     Name
  * ---------------------------
@@ -52,69 +52,24 @@
 /*
  * modification history (new versions first)
  * -----------------------------------------------------------
- * 20140925 v0.0.1   PR first version
+ * 20141025 v0.0.1   PR first version
  */
 
 /*==================[inclusions]=============================================*/
 
-#include "app_thread_lpc1769.h"
+#include "uposix.h"
+#include <stdio.h>
 
-/*==================[macros and definitions]=================================*/
+/*==================[macros]=================================================*/
 
-/*==================[internal data declaration]==============================*/
+/*==================[typedef]================================================*/
 
-/*==================[internal functions declaration]=========================*/
+/*==================[external data declaration]==============================*/
 
-/*==================[internal data definition]===============================*/
-
-pthread_t thread1, thread2;
-pthread_mutex_t mtx1, mtx2;
-
-/*==================[external data definition]===============================*/
-
-/*==================[internal functions definition]==========================*/
-
-void * thread1_main(void * a)
-{
-	printf("thread1\n");
-	while(1)
-	{
-		pthread_mutex_lock(&mtx1);
-		printf("x\n");
-		pthread_mutex_unlock(&mtx2);
-	}
-}
-
-void * thread2_main(void * a)
-{
-	printf("thread2\n");
-	while(1)
-	{
-		pthread_mutex_lock(&mtx2);
-		printf("y\n");
-		pthread_mutex_unlock(&mtx1);
-	}
-}
-
-/*==================[external functions definition]==========================*/
-
-/** @brief main function: Application entry point.
- */
-int main(void)
-{
-	printf("uPOSIX pthread test\n");
-
-	pthread_mutex_init(&mtx1, 0);
-	pthread_mutex_init(&mtx2, 0);
-
-	pthread_create(&thread1, 0, thread1_main, 0);
-	pthread_create(&thread2, 0, thread2_main, 0);
-
-	return 0;
-
-}
+/*==================[external functions declaration]=========================*/
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /*==================[end of file]============================================*/
+#endif /* APP_THREAD_LPC1769_H_ */
