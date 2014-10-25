@@ -1,0 +1,9 @@
+/Debug/
+/doc/**
+/doc/
+*~
+
+/Debug_LPC1769/
+/Debug_LPC4337/
+/Release_LPC1769/
+/Release_LPC4337/
