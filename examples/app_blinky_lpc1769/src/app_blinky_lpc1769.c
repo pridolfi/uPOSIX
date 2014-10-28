@@ -64,7 +64,7 @@
 /** @brief 	define this with 1 to see an example using pipes, use 0 to see
  * 			an example using mutexes
  */
-#define USE_PIPES	0
+#define USE_PIPES	1
 
 #define	USE_MUTEX	(!USE_PIPES)
 

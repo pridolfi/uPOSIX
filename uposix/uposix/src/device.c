@@ -90,7 +90,7 @@ static int getDeviceFromPath(const char * path, device_t ** dev)
 	{
 		for(i=0; i<devListSize; i++)
 		{
-			if(strstr(path, devList[i]->path))
+			if(strstr(path, devList[i]->name))
 			{
 				*dev = (device_t *)devList[i];
 				break;
@@ -147,7 +147,7 @@ int open(const char * path, int flags)
 
 	if(dev)
 	{
-		rv = dev->open(path, flags);
+		rv = dev->fops->open(dev, flags);
 		if(rv < 0)
 		{
 			fd = -1;
@@ -178,12 +178,12 @@ int read(int fd, void * buf, int len)
 		const device_t * dev = getDeviceFromDesc(fd);
 		if(dev)
 		{
-			rv = dev->read(fd, buf, len);
+			rv = dev->fops->read(dev, buf, len);
 		}
 	}
 	else if(fd < MAX_PIPES_FDS)
 	{
-		rv = devPipes.read(fd, buf, len);
+		rv = devPipes.fops->read((device_t *)fd, buf, len);
 	}
 
 	return rv;
@@ -206,12 +206,12 @@ int write(int fd, const void * buf, int len)
 		const device_t * dev = getDeviceFromDesc(fd);
 		if(dev)
 		{
-			rv = dev->write(fd, buf, len);
+			rv = dev->fops->write(dev, buf, len);
 		}
 	}
 	else if(fd < MAX_PIPES_FDS)
 	{
-		rv = devPipes.write(fd, buf, len);
+		rv = devPipes.fops->write((device_t *)fd, buf, len);
 	}
 
 	return rv;
@@ -232,7 +232,7 @@ int close(int fd)
 		const device_t * dev = getDeviceFromDesc(fd);
 		if(dev)
 		{
-			rv = dev->close(fd);
+			rv = dev->fops->close(dev);
 		}
 	}
 
@@ -258,7 +258,7 @@ int ioctl(int fd, int req, void * param)
 		const device_t * dev = getDeviceFromDesc(fd);
 		if(dev)
 		{
-			rv = dev->ioctl(fd, req, param);
+			rv = dev->fops->ioctl(dev, req, param);
 		}
 	}
 	else

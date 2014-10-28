@@ -68,21 +68,19 @@
 
 /*==================[internal functions declaration]=========================*/
 
-static int devTemplate_open(const char * path, int flags);
-static int devTemplate_read(int fd, void * buf, int len);
-static int devTemplate_write(int fd, const void * buf, int len);
-static int devTemplate_close(int fd);
-static int devTemplate_ioctl(int fd, int req, void * param);
+static int devTemplate_open (const device_t * const dev, int flags);
+static int devTemplate_read (const device_t * const dev, void * buf, int len);
+static int devTemplate_write(const device_t * const dev, const void * buf, int len);
+static int devTemplate_close(const device_t * const dev);
+static int devTemplate_ioctl(const device_t * const dev, int req, void * param);
 
 /*==================[internal data definition]===============================*/
 
 /*==================[external data definition]===============================*/
 
-/** @brief Template device struct. */
-const device_t devTemplate =
+/** @brief Template file operations. */
+const fops_t devTemplate_fops =
 {
-		"template",				/**< path (relative to /dev/)  */
-		(void *)0,				/**< peripheral base address   */
 		devTemplate_open,		/**< pointer to open function  */
 		devTemplate_read,		/**< pointer to read function  */
 		devTemplate_write,		/**< pointer to write function */
@@ -90,11 +88,19 @@ const device_t devTemplate =
 		devTemplate_ioctl		/**< pointer to ioctl function */
 };
 
+/** @brief Template device struct. */
+const device_t devTemplate =
+{
+		"template",				/**< path (relative to /dev/)  */
+		(void *)TEMPLATE_PTR,	/**< peripheral base address   */
+		&devTemplate_fops
+};
+
 /*==================[internal functions definition]==========================*/
 
 /** @brief Generic device open function.
  */
-static int devTemplate_open(const char * path, int flags)
+static int devTemplate_open(const device_t * const dev, int flags)
 {
 	int rv = -1;
 
@@ -105,7 +111,7 @@ static int devTemplate_open(const char * path, int flags)
 
 /** @brief Generic device read function.
  */
-static int devTemplate_read(int fd, void * buf, int len)
+static int devTemplate_read(const device_t * const dev, void * buf, int len)
 {
 	int rv = -1;
 
@@ -116,7 +122,7 @@ static int devTemplate_read(int fd, void * buf, int len)
 
 /** @brief Generic device write function.
  */
-static int devTemplate_write(int fd, const void * buf, int len)
+static int devTemplate_write(const device_t * const dev, const void * buf, int len)
 {
 	int rv = -1;
 
@@ -127,7 +133,7 @@ static int devTemplate_write(int fd, const void * buf, int len)
 
 /** @brief Generic device close function.
  */
-static int devTemplate_close(int fd)
+static int devTemplate_close(const device_t * const dev)
 {
 	int rv = -1;
 
@@ -138,13 +144,13 @@ static int devTemplate_close(int fd)
 
 /** @brief Generic device ioctl function.
  */
-static int devTemplate_ioctl(int fd, int req, void * param)
+static int devTemplate_ioctl(const device_t * dev, int req, void * param)
 {
 	int rv = -1;
 
 	/* TODO: Add your device I/O request code here */
 	/* Example: */
-	if(devList[fd] == &devTemplate)
+	if((void *)TEMPLATE_PTR == dev->ptr)
 	{
 		switch(req)
 		{

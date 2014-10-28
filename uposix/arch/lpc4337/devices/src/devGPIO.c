@@ -67,11 +67,11 @@
 
 /*==================[internal functions declaration]=========================*/
 
-static int devGPIO_open(const char * path, int flags);
-static int devGPIO_read(int fd, void * buf, int len);
-static int devGPIO_write(int fd, const void * buf, int len);
-static int devGPIO_close(int fd);
-static int devGPIO_ioctl(int fd, int req, void * param);
+static int devGPIO_open (const device_t * const dev, int flags);
+static int devGPIO_read (const device_t * const dev, void * buf, int len);
+static int devGPIO_write(const device_t * const dev, const void * buf, int len);
+static int devGPIO_close(const device_t * const dev);
+static int devGPIO_ioctl(const device_t * const dev, int req, void * param);
 
 /*==================[internal data definition]===============================*/
 
@@ -82,17 +82,28 @@ static uint32_t devGPIO_portNum = 0;
 
 /*==================[external data definition]===============================*/
 
-/** @brief GPIO device struct. */
+/**
+ * @brief file operations for GPIO
+ */
+const fops_t devGPIO_fops =
+{
+		devGPIO_open,		/**< pointer to open function	*/
+		devGPIO_read,		/**< pointer to read function  	*/
+		devGPIO_write,		/**< pointer to write function 	*/
+		devGPIO_close,		/**< pointer to close function 	*/
+		devGPIO_ioctl		/**< pointer to ioctl function 	*/
+};
+
+/**
+ * @brief device struct for GPIO
+ */
 const device_t devGPIO =
 {
-		"gpio",				/**< path (relative to /dev/)  */
-		(void *)LPC_GPIO_PORT,/**< peripheral base address   */
-		devGPIO_open,		/**< pointer to open function  */
-		devGPIO_read,		/**< pointer to read function  */
-		devGPIO_write,		/**< pointer to write function */
-		devGPIO_close,		/**< pointer to close function */
-		devGPIO_ioctl		/**< pointer to ioctl function */
+		"gpio",					/**< device name (relative to /dev/)  	*/
+		(void *)LPC_GPIO_PORT,	/**< peripheral base address 			*/
+		&devGPIO_fops			/**< file operations */
 };
+
 
 /*==================[internal functions definition]==========================*/
 
@@ -103,9 +114,9 @@ const device_t devGPIO =
  * @param flags	Access flags, device dependent.	Not used.
  * @return 		Always zero.
  */
-static int devGPIO_open(const char * path, int flags)
+static int devGPIO_open(const device_t * const dev, int flags)
 {
-	Chip_GPIO_Init(devGPIO.periph);
+	Chip_GPIO_Init(dev->ptr);
 
 	return 0;
 }
@@ -118,16 +129,16 @@ static int devGPIO_open(const char * path, int flags)
  * @return 		Number of bytes actually read, normally len, or -1 in case of an error.
  *
  */
-static int devGPIO_read(int fd, void * buf, int len)
+static int devGPIO_read(const device_t * const dev, void * buf, int len)
 {
 	int rv = -1;
 	int i;
 
-	if((len <= 4)&&(devList[fd]==&devGPIO))
+	if((len <= 4)&&(dev->ptr==LPC_GPIO_PORT))
 	{
 		for(i=0; i<=len; i++)
 		{
-			((uint32_t*)buf)[i] = Chip_GPIO_ReadValue(devGPIO.periph, i);
+			((uint32_t*)buf)[i] = Chip_GPIO_ReadValue(dev->ptr, i);
 		}
 		rv = len;
 	}
@@ -144,13 +155,13 @@ static int devGPIO_read(int fd, void * buf, int len)
  * @return 		Number of bytes actually written (4 bytes) or -1 in case of an error.
  *
  */
-static int devGPIO_write(int fd, const void * buf, int len)
+static int devGPIO_write(const device_t * const dev, const void * buf, int len)
 {
 	int rv = -1;
 
-	if((len >= sizeof(uint32_t))&&(devList[fd]==&devGPIO))
+	if((len >= sizeof(uint32_t))&&(dev->ptr==LPC_GPIO_PORT))
 	{
-		Chip_GPIO_SetPortValue(devGPIO.periph, devGPIO_portNum, *((uint32_t *)buf));
+		Chip_GPIO_SetPortValue(dev->ptr, devGPIO_portNum, *((uint32_t *)buf));
 		rv = sizeof(uint32_t);
 	}
 
@@ -163,9 +174,9 @@ static int devGPIO_write(int fd, const void * buf, int len)
  * @return 		Device dependent, normally 0 on success.
  *
  */
-static int devGPIO_close(int fd)
+static int devGPIO_close(const device_t * const dev)
 {
-	Chip_GPIO_DeInit(devGPIO.periph);
+	Chip_GPIO_DeInit(dev->ptr);
 
 	return 0;
 }
@@ -197,27 +208,27 @@ static int devGPIO_close(int fd)
  * @return 		Zero if request completed successfully, -1 on error.
  *
  */
-static int devGPIO_ioctl(int fd, int req, void * param)
+static int devGPIO_ioctl(const device_t * const dev, int req, void * param)
 {
 	int rv = -1;
 	devGPIO_pin_t * pin = (devGPIO_pin_t *)param;
 
-	if(devList[fd] == &devGPIO)
+	if(LPC_GPIO_PORT == dev->ptr)
 	{
 		switch(req)
 		{
 			case devGPIO_REQ_READ_BIT:
-				pin->value = Chip_GPIO_GetPinState(devGPIO.periph, pin->port, pin->bit);
+				pin->value = Chip_GPIO_GetPinState(dev->ptr, pin->port, pin->bit);
 				rv = 0;
 				break;
 
 			case devGPIO_REQ_WRITE_BIT:
-				Chip_GPIO_WritePortBit(devGPIO.periph, pin->port, pin->bit, pin->value);
+				Chip_GPIO_WritePortBit(dev->ptr, pin->port, pin->bit, pin->value);
 				rv = 0;
 				break;
 
 			case devGPIO_REQ_WRITE_DIR:
-				Chip_GPIO_WriteDirBit(devGPIO.periph, pin->port, pin->bit, pin->value);
+				Chip_GPIO_WriteDirBit(dev->ptr, pin->port, pin->bit, pin->value);
 				rv = 0;
 				break;
 
@@ -227,7 +238,7 @@ static int devGPIO_ioctl(int fd, int req, void * param)
 				break;
 
 			case devGPIO_REQ_TOGGLE_BIT:
-				Chip_GPIO_SetPinToggle(devGPIO.periph, pin->port, pin->bit);
+				Chip_GPIO_SetPinToggle(dev->ptr, pin->port, pin->bit);
 				rv = 0;
 				break;
 

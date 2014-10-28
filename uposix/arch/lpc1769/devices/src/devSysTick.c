@@ -66,11 +66,11 @@
 
 /*==================[internal functions declaration]=========================*/
 
-static int devSysTick_open(const char * path, int flags);
-static int devSysTick_read(int fd, void * buf, int len);
-static int devSysTick_write(int fd, const void * buf, int len);
-static int devSysTick_close(int fd);
-static int devSysTick_ioctl(int fd, int req, void * param);
+static int devSysTick_open (const device_t * const dev, int flags);
+static int devSysTick_read (const device_t * const dev, void * buf, int len);
+static int devSysTick_write(const device_t * const dev, const void * buf, int len);
+static int devSysTick_close(const device_t * const dev);
+static int devSysTick_ioctl(const device_t * const dev, int req, void * param);
 
 /*==================[internal data definition]===============================*/
 
@@ -81,6 +81,16 @@ devSysTick_callback_t userCallback = 0;
 
 /*==================[external data definition]===============================*/
 
+/** @brief SysTick file operations */
+const fops_t devSysTick_fops =
+{
+		devSysTick_open,		/**< pointer to open function  */
+		devSysTick_read,		/**< pointer to read function  */
+		devSysTick_write,		/**< pointer to write function */
+		devSysTick_close,		/**< pointer to close function */
+		devSysTick_ioctl		/**< pointer to ioctl function */
+};
+
 /**
  * @struct devSysTick
  * @brief Device struct for SysTick.
@@ -89,11 +99,7 @@ const device_t devSysTick =
 {
 		"systick",				/**< path (relative to /dev/)  */
 		(void *)SysTick,		/**< peripheral base address   */
-		devSysTick_open,		/**< pointer to open function  */
-		devSysTick_read,		/**< pointer to read function  */
-		devSysTick_write,		/**< pointer to write function */
-		devSysTick_close,		/**< pointer to close function */
-		devSysTick_ioctl		/**< pointer to ioctl function */
+		&devSysTick_fops,
 };
 
 /*==================[internal functions definition]==========================*/
@@ -105,7 +111,7 @@ const device_t devSysTick =
  * @param flags	Not used.
  * @return 		Zero if the initialization was correct, -1 otherwise.
  */
-static int devSysTick_open(const char * path, int flags)
+static int devSysTick_open(const device_t * const dev, int flags)
 {
 #ifndef __USE_UPOSIX_RTOS /* SysTick is used by the uPOSIX RTOS */
 	int rv = -1;
@@ -127,11 +133,11 @@ static int devSysTick_open(const char * path, int flags)
  * @param len	Bytes to be read, should be 4 or more.
  * @return 		Number of bytes actually read, normally 4, or -1 in case of an error.
  */
-static int devSysTick_read(int fd, void * buf, int len)
+static int devSysTick_read(const device_t * const dev, void * buf, int len)
 {
 	int rv = -1;
 #ifndef __USE_UPOSIX_RTOS
-	if((len >= sizeof(uint32_t)) && (&devSysTick == devList[fd]))
+	if((len >= sizeof(uint32_t)) && (SysTick == dev->ptr))
 	{
 		memcpy(buf, (void *)&(SysTick->VAL), sizeof(uint32_t));
 		rv = sizeof(uint32_t);
@@ -148,11 +154,11 @@ static int devSysTick_read(int fd, void * buf, int len)
  * @return 		Number of bytes actually written (4 bytes) or -1 in case of an error.
  *
  */
-static int devSysTick_write(int fd, const void * buf, int len)
+static int devSysTick_write(const device_t * const dev, const void * buf, int len)
 {
 	int rv = -1;
 #ifndef __USE_UPOSIX_RTOS
-	if((len >= sizeof(uint32_t)) && (&devSysTick == devList[fd]))
+	if((len >= sizeof(uint32_t)) && (SysTick == dev->ptr))
 	{
 		memcpy((void *)&(SysTick->VAL), buf, sizeof(uint32_t));
 		rv = sizeof(uint32_t);
@@ -167,11 +173,11 @@ static int devSysTick_write(int fd, const void * buf, int len)
  * @return 		Device dependent, normally 0 on success.
  *
  */
-static int devSysTick_close(int fd)
+static int devSysTick_close(const device_t * const dev)
 {
 	int rv = -1;
 #ifndef __USE_UPOSIX_RTOS
-	if(&devSysTick == devList[fd])
+	if(SysTick == dev->ptr)
 	{
 		SysTick->CTRL = 0;
 		SysTick->LOAD = 0;
@@ -202,10 +208,10 @@ static int devSysTick_close(int fd)
  * @return 		Zero if request completed successfully, -1 on error.
  *
  */
-static int devSysTick_ioctl(int fd, int req, void * param)
+static int devSysTick_ioctl(const device_t * const dev, int req, void * param)
 {
 	int rv = -1;
-	if(&devSysTick == devList[fd])
+	if(SysTick == dev->ptr)
 	{
 		switch(req)
 		{

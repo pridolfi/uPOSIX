@@ -65,25 +65,30 @@
 
 /*==================[internal functions declaration]=========================*/
 
-static int devLPCOpen_open(const char * path, int flags);
-static int devLPCOpen_read(int fd, void * buf, int len);
-static int devLPCOpen_write(int fd, const void * buf, int len);
-static int devLPCOpen_close(int fd);
-static int devLPCOpen_ioctl(int fd, int req, void * param);
+static int devLPCOpen_open (const device_t * const dev, int flags);
+static int devLPCOpen_read (const device_t * const dev, void * buf, int len);
+static int devLPCOpen_write(const device_t * const dev, const void * buf, int len);
+static int devLPCOpen_close(const device_t * const dev);
+static int devLPCOpen_ioctl(const device_t * const dev, int req, void * param);
 
 /*==================[internal data definition]===============================*/
 
 /*==================[external data definition]===============================*/
 
-const device_t devLPCOpen =		/* device struct for LPCOpen */
+const fops_t devLPCOpen_fops =
 {
-		"lpcopen",				/* path (relative to /dev/)  */
-		(void *)0,				/* peripheral base address 	 */
 		devLPCOpen_open,		/* pointer to open function  */
 		devLPCOpen_read,		/* pointer to read function  */
 		devLPCOpen_write,		/* pointer to write function */
 		devLPCOpen_close,		/* pointer to close function */
 		devLPCOpen_ioctl		/* pointer to ioctl function */
+};
+
+const device_t devLPCOpen =		/* device struct for LPCOpen */
+{
+		"lpcopen",				/* path (relative to /dev/)  */
+		(void *)0,				/* peripheral base address 	 */
+		&devLPCOpen_fops,
 };
 
 /*==================[internal functions definition]==========================*/
@@ -95,7 +100,7 @@ const device_t devLPCOpen =		/* device struct for LPCOpen */
  * @param flags	Access flags. Not used.
  * @return 		Zero if initialization was ok, -1 on error.
  */
-static int devLPCOpen_open(const char * path, int flags)
+static int devLPCOpen_open(const device_t * const dev, int flags)
 {
 #ifndef __USE_UPOSIX_RTOS
 #if defined (__USE_LPCOPEN)
@@ -121,7 +126,7 @@ static int devLPCOpen_open(const char * path, int flags)
  * @param len	Not used.
  * @return 		Always -1.
  */
-static int devLPCOpen_read(int fd, void * buf, int len)
+static int devLPCOpen_read(const device_t * const dev, void * buf, int len)
 {
 	return -1;
 }
@@ -133,7 +138,7 @@ static int devLPCOpen_read(int fd, void * buf, int len)
  * @param len	Not used.
  * @return 		Always -1.
  */
-static int devLPCOpen_write(int fd, const void * buf, int len)
+static int devLPCOpen_write(const device_t * const dev, const void * buf, int len)
 {
 	return -1;
 }
@@ -143,7 +148,7 @@ static int devLPCOpen_write(int fd, const void * buf, int len)
  * @param fd	Not used.
  * @return 		Always -1.
  */
-static int devLPCOpen_close(int fd)
+static int devLPCOpen_close(const device_t * const dev)
 {
 	return -1;
 }
@@ -160,22 +165,20 @@ static int devLPCOpen_close(int fd)
  *
  * @return 		Zero if request completed successfully, -1 on error.
  */
-static int devLPCOpen_ioctl(int fd, int req, void * param)
+static int devLPCOpen_ioctl(const device_t * const dev, int req, void * param)
 {
 	int rv = -1;
 
-	if(devList[fd] == &devLPCOpen)
+	switch(req)
 	{
-		switch(req)
-		{
-			case devLPCOpen_REQ_GET_SYSTEMCORECLOCK:
-				*(uint32_t *)param = SystemCoreClock;
-				rv = 0;
-				break;
-			default:
-				break;
-		}
+		case devLPCOpen_REQ_GET_SYSTEMCORECLOCK:
+			*(uint32_t *)param = SystemCoreClock;
+			rv = 0;
+			break;
+		default:
+			break;
 	}
+
 	return rv;
 }
 

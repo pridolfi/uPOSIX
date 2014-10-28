@@ -66,11 +66,11 @@
 
 /*==================[internal functions declaration]=========================*/
 
-static int devPipes_open(const char * path, int flags);
-static int devPipes_read(int fd, void * buf, int len);
-static int devPipes_write(int fd, const void * buf, int len);
-static int devPipes_close(int fd);
-static int devPipes_ioctl(int fd, int req, void * param);
+static int devPipes_open (const device_t * const dev, int flags);
+static int devPipes_read (const device_t * const dev, void * buf, int len);
+static int devPipes_write(const device_t * const dev, const void * buf, int len);
+static int devPipes_close(const device_t * const dev);
+static int devPipes_ioctl(const device_t * const dev, int req, void * param);
 
 /*==================[internal data definition]===============================*/
 
@@ -82,16 +82,22 @@ uint8_t pipeCount = 0;
 
 /*==================[external data definition]===============================*/
 
-/** @brief Pipes device struct. */
-const device_t devPipes =
+/** @brief Pipes file ops. */
+const fops_t devPipes_fops =
 {
-		"pipes",			/**< path (relative to /dev/)  */
-		(void *)pipes,		/**< peripheral base address   */
 		devPipes_open,		/**< pointer to open function  */
 		devPipes_read,		/**< pointer to read function  */
 		devPipes_write,		/**< pointer to write function */
 		devPipes_close,		/**< pointer to close function */
 		devPipes_ioctl		/**< pointer to ioctl function */
+};
+
+/** @brief Pipes device struct. */
+const device_t devPipes =
+{
+		"pipes",			/**< path (relative to /dev/)  */
+		(void *)pipes,		/**< peripheral base address   */
+		&devPipes_fops		/**< file operations */
 };
 
 /*==================[internal functions definition]==========================*/
@@ -120,7 +126,7 @@ static pipe_t * getPipeFromDescriptor(int pfd, pipeEnd_t rw)
 
 /** @brief 		Open function, not used.
  */
-static int devPipes_open(const char * path, int flags)
+static int devPipes_open(const device_t * const dev, int flags)
 {
 	return -1;
 }
@@ -132,10 +138,10 @@ static int devPipes_open(const char * path, int flags)
  * 	@param len	Data buffer length.
  * 	@return		Actually read bytes, 0 if pipe empty, -1 on error.
  */
-static int devPipes_read(int fd, void * buf, int len)
+static int devPipes_read(const device_t * const dev, void * buf, int len)
 {
 	int rv = -1;
-	pipe_t * p = getPipeFromDescriptor(fd, PIPE_READ_END);
+	pipe_t * p = getPipeFromDescriptor((int)dev, PIPE_READ_END);
 
 	if((p != 0) && (buf != 0) && (len != 0) && (len < PIPE_BUFFER_LENGTH))
 	{
@@ -172,10 +178,10 @@ static int devPipes_read(int fd, void * buf, int len)
  * 	@param len	Data buffer length.
  * 	@return		Actually written bytes, 0 if pipe full, -1 on error.
  */
-static int devPipes_write(int fd, const void * buf, int len)
+static int devPipes_write(const device_t * const dev, const void * buf, int len)
 {
 	int rv = -1;
-	pipe_t * p = getPipeFromDescriptor(fd, PIPE_WRITE_END);
+	pipe_t * p = getPipeFromDescriptor((int)dev, PIPE_WRITE_END);
 
 	if((p != 0) && (buf != 0) && (len != 0) && (len < PIPE_BUFFER_LENGTH))
 	{
@@ -205,14 +211,14 @@ static int devPipes_write(int fd, const void * buf, int len)
 
 /** @brief 		Close function, not used.
  */
-static int devPipes_close(int fd)
+static int devPipes_close(const device_t * const dev)
 {
 	return -1;
 }
 
 /** @brief 		Ioctl function, not used.
  */
-static int devPipes_ioctl(int fd, int req, void * param)
+static int devPipes_ioctl(const device_t * const dev, int req, void * param)
 {
 	return -1;
 }

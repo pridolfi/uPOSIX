@@ -58,22 +58,30 @@
 
 /*==================[typedef]================================================*/
 
-typedef int (*open_t) (const char * path, int flags);
-typedef int (*read_t) (int fd, void * buf, int len);
-typedef int (*write_t)(int fd, const void * buf, int len);
-typedef int (*close_t)(int fd);
-typedef int (*ioctl_t)(int fd, int req, void * param);
+typedef struct device_t_struct device_t;
 
-/**@brief Generic Device definition structure */
+typedef int (*open_t) (const device_t * const dev, int flags);
+typedef int (*read_t) (const device_t * const dev, void * buf, int len);
+typedef int (*write_t)(const device_t * const dev, const void * buf, int len);
+typedef int (*close_t)(const device_t * const dev);
+typedef int (*ioctl_t)(const device_t * const dev, int req, void * param);
+
+/**@brief File operation functions structure */
 typedef struct
 {
-	const char * path;		/**< path (relative to /dev/)  */
-	void * periph;          /**< peripheral base address   */
 	open_t open;            /**< pointer to open function  */
 	read_t read;            /**< pointer to read function  */
 	write_t write;          /**< pointer to write function */
 	close_t close;          /**< pointer to close function */
 	ioctl_t ioctl;          /**< pointer to ioctl function */
+}fops_t;
+
+/**@brief Generic Device definition structure */
+typedef struct device_t_struct
+{
+	const char * name;		/**< path (relative to /dev/)  */
+	void * ptr;         	/**< peripheral base address   */
+	const fops_t * fops;	/**< file op functions 		   */
 }device_t;
 
 /*==================[external data declaration]==============================*/

@@ -62,11 +62,11 @@
 
 /*==================[internal functions declaration]=========================*/
 
-static int devGPIO_open(const char * path, int flags);
-static int devGPIO_read(int fd, void * buf, int len);
-static int devGPIO_write(int fd, const void * buf, int len);
-static int devGPIO_close(int fd);
-static int devGPIO_ioctl(int fd, int req, void * param);
+static int devGPIO_open (const device_t * const dev, int flags);
+static int devGPIO_read (const device_t * const dev, void * buf, int len);
+static int devGPIO_write(const device_t * const dev, const void * buf, int len);
+static int devGPIO_close(const device_t * const dev);
+static int devGPIO_ioctl(const device_t * const dev, int req, void * param);
 
 /*==================[internal data definition]===============================*/
 
@@ -78,17 +78,25 @@ static uint32_t devGPIO_portNum = 0;
 /*==================[external data definition]===============================*/
 
 /**
- * @brief device struct for GPIO
+ * @brief file operations for GPIO
  */
-const device_t devGPIO =
+const fops_t devGPIO_fops =
 {
-		"gpio",				/**< path (relative to /dev/)  	*/
-		(void *)LPC_GPIO,	/**< peripheral base address 	*/
 		devGPIO_open,		/**< pointer to open function	*/
 		devGPIO_read,		/**< pointer to read function  	*/
 		devGPIO_write,		/**< pointer to write function 	*/
 		devGPIO_close,		/**< pointer to close function 	*/
 		devGPIO_ioctl		/**< pointer to ioctl function 	*/
+};
+
+/**
+ * @brief device struct for GPIO
+ */
+const device_t devGPIO =
+{
+		"gpio",				/**< device name (relative to /dev/)  	*/
+		(void *)LPC_GPIO,	/**< peripheral base address 			*/
+		&devGPIO_fops		/**< file operations */
 };
 
 /**
@@ -132,7 +140,7 @@ const devGPIO_pin_t devGPIO_BaseBoardRevB_LED_BLUE 	= {0, 26, 1};
  * @param flags	Access flags, device dependent.	Not used.
  * @return 		Always zero.
  */
-static int devGPIO_open(const char * path, int flags)
+static int devGPIO_open(const device_t * const dev, int flags)
 {
 	Chip_GPIO_Init(LPC_GPIO);
 	Chip_IOCON_Init(LPC_IOCON);
@@ -142,22 +150,22 @@ static int devGPIO_open(const char * path, int flags)
 
 /** @brief 	This function reads GPIO ports (Ports 0 through len -max 4-).
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @param buf	Buffer where port data will be stored.
  * @param len	Max port to read (0 through 4).
  * @return 		Number of bytes actually read, normally len, or -1 in case of an error.
  *
  */
-static int devGPIO_read(int fd, void * buf, int len)
+static int devGPIO_read(const device_t * const dev, void * buf, int len)
 {
 	int rv = -1;
 	int i;
 
-	if((len <= 4)&&(devList[fd]==&devGPIO))
+	if((len <= 4)&&(dev->ptr == LPC_GPIO))
 	{
 		for(i=0; i<=len; i++)
 		{
-			((uint32_t*)buf)[i] = Chip_GPIO_ReadValue(LPC_GPIO, i);
+			((uint32_t*)buf)[i] = Chip_GPIO_ReadValue(dev->ptr, i);
 		}
 		rv = len;
 	}
@@ -168,19 +176,19 @@ static int devGPIO_read(int fd, void * buf, int len)
 /** @brief 	This function writes an entire GPIO port. Use ioctl #devGPIO_REQ_SET_PORT
  * 			to select the port to be read. Port 0 is selected by default.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @param buf	Buffer pointing to the data to be written.
  * @param len	Buffer length, should be 4 bytes (32 bits).
  * @return 		Number of bytes actually written (4 bytes) or -1 in case of an error.
  *
  */
-static int devGPIO_write(int fd, const void * buf, int len)
+static int devGPIO_write(const device_t * const dev, const void * buf, int len)
 {
 	int rv = -1;
 
-	if((len >= sizeof(uint32_t))&&(devList[fd]==&devGPIO))
+	if((len >= sizeof(uint32_t))&&(dev->ptr == LPC_GPIO))
 	{
-		Chip_GPIO_SetPortValue(LPC_GPIO, devGPIO_portNum, *((uint32_t *)buf));
+		Chip_GPIO_SetPortValue(dev->ptr, devGPIO_portNum, *((uint32_t *)buf));
 		rv = sizeof(uint32_t);
 	}
 
@@ -189,20 +197,25 @@ static int devGPIO_write(int fd, const void * buf, int len)
 
 /** @brief This function deactivates GPIO.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @return 		Device dependent, normally 0 on success.
  *
  */
-static int devGPIO_close(int fd)
+static int devGPIO_close(const device_t * const dev)
 {
-	Chip_GPIO_DeInit(LPC_GPIO);
+	int rv = -1;
 
-	return 0;
+	if(dev->ptr == LPC_GPIO)
+	{
+		Chip_GPIO_DeInit(dev->ptr);
+	}
+
+	return rv;
 }
 
 /** @brief This function is used to interact with GPIO peripheral.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @param req	ioctl request defined in #devGPIO_ioctl_requests, should be:
  *		- #devGPIO_REQ_READ_BIT:	Read a single bit specified in the #devGPIO_pin_t
  *									structure passed as 3rd argument.
@@ -227,12 +240,12 @@ static int devGPIO_close(int fd)
  * @return 		Zero if request completed successfully, -1 on error.
  *
  */
-static int devGPIO_ioctl(int fd, int req, void * param)
+static int devGPIO_ioctl(const device_t * const dev, int req, void * param)
 {
 	int rv = -1;
 	devGPIO_pin_t * pin = (devGPIO_pin_t *)param;
 
-	if(devList[fd] == &devGPIO)
+	if(dev->ptr == LPC_GPIO)
 	{
 		switch(req)
 		{
