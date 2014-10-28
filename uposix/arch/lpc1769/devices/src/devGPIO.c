@@ -135,8 +135,7 @@ const devGPIO_pin_t devGPIO_BaseBoardRevB_LED_BLUE 	= {0, 26, 1};
 
 /** @brief This function initializes GPIO peripheral for LPC1769.
  *
- * @param path	String containing the path to the device, should be "/dev/gpio".
- * 				Not used.
+ * @param dev	Device structure.
  * @param flags	Access flags, device dependent.	Not used.
  * @return 		Always zero.
  */

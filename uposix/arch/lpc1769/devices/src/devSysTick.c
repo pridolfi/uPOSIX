@@ -106,8 +106,7 @@ const device_t devSysTick =
 
 /** @brief This function initializes the SysTick timer.
  *
- * @param path	String containing the path to the device, should be "/dev/systick".
- * 				Not used.
+ * @param dev	Device structure.
  * @param flags	Not used.
  * @return 		Zero if the initialization was correct, -1 otherwise.
  */
@@ -128,7 +127,7 @@ static int devSysTick_open(const device_t * const dev, int flags)
 
 /** @brief 	This function reads SysTick current value register.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @param buf	Buffer where port data will be stored.
  * @param len	Bytes to be read, should be 4 or more.
  * @return 		Number of bytes actually read, normally 4, or -1 in case of an error.
@@ -148,7 +147,7 @@ static int devSysTick_read(const device_t * const dev, void * buf, int len)
 
 /** @brief 	This function writes SysTick current value register.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @param buf	Buffer pointing to the data to be written.
  * @param len	Buffer length, should be 4 bytes (32 bits).
  * @return 		Number of bytes actually written (4 bytes) or -1 in case of an error.
@@ -169,7 +168,7 @@ static int devSysTick_write(const device_t * const dev, const void * buf, int le
 
 /** @brief This function deactivates SysTick.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @return 		Device dependent, normally 0 on success.
  *
  */
@@ -193,7 +192,7 @@ static int devSysTick_close(const device_t * const dev)
 
 /** @brief This function is used to interact with SysTick.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @param req	ioctl request defined in #devSysTick_ioctl_requests, should be:
  *				- #devSysTick_REQ_SET_TICKS:	Restarts SysTick with a new interrupt
  *												frequency.

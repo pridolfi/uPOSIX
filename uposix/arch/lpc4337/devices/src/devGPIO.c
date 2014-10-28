@@ -109,8 +109,7 @@ const device_t devGPIO =
 
 /** @brief This function initializes GPIO peripheral for LPC4337.
  *
- * @param path	String containing the path to the device, should be "/dev/gpio".
- * 				Not used.
+ * @param dev	Device structure.
  * @param flags	Access flags, device dependent.	Not used.
  * @return 		Always zero.
  */
@@ -123,7 +122,7 @@ static int devGPIO_open(const device_t * const dev, int flags)
 
 /** @brief 	This function reads GPIO ports (Ports 0 through len -max 4-).
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @param buf	Buffer where port data will be stored.
  * @param len	Max port to read (0 through 4).
  * @return 		Number of bytes actually read, normally len, or -1 in case of an error.
@@ -149,7 +148,7 @@ static int devGPIO_read(const device_t * const dev, void * buf, int len)
 /** @brief 	This function writes an entire GPIO port. Use ioctl #devGPIO_REQ_SET_PORT
  * 			to select the port to be read. Port 0 is selected by default.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @param buf	Buffer pointing to the data to be written.
  * @param len	Buffer length, should be 4 bytes (32 bits).
  * @return 		Number of bytes actually written (4 bytes) or -1 in case of an error.
@@ -170,7 +169,7 @@ static int devGPIO_write(const device_t * const dev, const void * buf, int len)
 
 /** @brief This function deactivates GPIO.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @return 		Device dependent, normally 0 on success.
  *
  */
@@ -183,7 +182,7 @@ static int devGPIO_close(const device_t * const dev)
 
 /** @brief This function is used to interact with GPIO peripheral.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  * @param req	ioctl request defined in #devGPIO_ioctl_requests, should be:
  *		- #devGPIO_REQ_READ_BIT:	Read a single bit specified in the #devGPIO_pin_t
  *									structure passed as 3rd argument.

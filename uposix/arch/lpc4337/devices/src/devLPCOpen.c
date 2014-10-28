@@ -95,8 +95,7 @@ const device_t devLPCOpen =		/* device struct for LPCOpen */
 
 /** @brief This function initializes LPCOpen library.
  *
- * @param path	String containing the path to the device, should be "/dev/lpcopen".
- * 				Not used.
+ * @param dev	Device structure.
  * @param flags	Access flags. Not used.
  * @return 		Zero if initialization was ok, -1 on error.
  */
@@ -121,7 +120,7 @@ static int devLPCOpen_open(const device_t * const dev, int flags)
 
 /** @brief 	read function is not used in LPCOpen.
  *
- * @param fd	Not used.
+ * @param dev	Device structure.
  * @param buf	Not used.
  * @param len	Not used.
  * @return 		Always -1.
@@ -133,7 +132,7 @@ static int devLPCOpen_read(const device_t * const dev, void * buf, int len)
 
 /** @brief 	write function is not used in LPCOpen.
  *
- * @param fd	Not used.
+ * @param dev	Device structure.
  * @param buf	Not used.
  * @param len	Not used.
  * @return 		Always -1.
@@ -145,7 +144,7 @@ static int devLPCOpen_write(const device_t * const dev, const void * buf, int le
 
 /** @brief 	close function is not used in LPCOpen.
  *
- * @param fd	Not used.
+ * @param dev	Device structure.
  * @return 		Always -1.
  */
 static int devLPCOpen_close(const device_t * const dev)
@@ -155,7 +154,7 @@ static int devLPCOpen_close(const device_t * const dev)
 
 /** @brief 	ioctl function, used to get information from LPCOpen.
  *
- * @param fd	Device file descriptor, returned by open.
+ * @param dev	Device structure.
  *
  * @param req	ioctl request defined in #devGPIO_ioctl_requests, should be:
  *		- #devLPCOpen_REQ_GET_SYSTEMCORECLOCK:	Read CMSIS SystemCoreClock variable.

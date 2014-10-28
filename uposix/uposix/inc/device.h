@@ -60,6 +60,7 @@
 
 typedef struct device_t_struct device_t;
 
+
 typedef int (*open_t) (const device_t * const dev, int flags);
 typedef int (*read_t) (const device_t * const dev, void * buf, int len);
 typedef int (*write_t)(const device_t * const dev, const void * buf, int len);
@@ -79,9 +80,9 @@ typedef struct
 /**@brief Generic Device definition structure */
 typedef struct device_t_struct
 {
-	const char * name;		/**< path (relative to /dev/)  */
-	void * ptr;         	/**< peripheral base address   */
-	const fops_t * fops;	/**< file op functions 		   */
+	const char * name;		/**< path (relative to /dev/)  	*/
+	void * ptr;         	/**< user generic pointer 		*/
+	const fops_t * fops;	/**< file op functions 		   	*/
 }device_t;
 
 /*==================[external data declaration]==============================*/
