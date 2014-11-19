@@ -167,7 +167,7 @@ pthread_t getNextContext(void)
 	return t;
 }
 
-/** @brief 	Get thread context int RUNNING state (current thread).
+/** @brief 	Get thread context in RUNNING state (current thread).
  * 	@return Thread context currently in execution.
  */
 pthread_t getCurrentContext(void)
