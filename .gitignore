@@ -24,3 +24,10 @@
 
 #Eclipse files
 .metadata
+
+#Backup files
+*~
+
+#User projects
+projects/
+

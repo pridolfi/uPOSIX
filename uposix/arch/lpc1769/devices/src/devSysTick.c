@@ -77,7 +77,7 @@ static int devSysTick_ioctl(const device_t * const dev, int req, void * param);
 /**
  * @brief Store the current user callback for SysTick IRQ.
  */
-devSysTick_callback_t userCallback = 0;
+static devSysTick_callback_t userCallback = 0;
 
 /*==================[external data definition]===============================*/
 
