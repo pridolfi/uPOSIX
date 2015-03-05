@@ -247,10 +247,14 @@ void SysTick_Handler(void)
 	kernel_tick();
 #endif
 
+	/* user application tick handler */
 	if(userCallback)
 	{
 		userCallback();
 	}
+
+	/* device driver tick handlers */
+	devListExecuteHandlers();
 
 #ifdef __USE_UPOSIX_RTOS
 	kernel_irq_end(s);

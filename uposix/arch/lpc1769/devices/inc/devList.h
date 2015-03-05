@@ -62,6 +62,9 @@
 
 /*==================[typedef]================================================*/
 
+/** @brief Definition of tick handler for device drivers */
+typedef void (*devTickHandler_t)(void);
+
 /*==================[external data declaration]==============================*/
 
 extern const device_t * const devList[];
@@ -69,6 +72,9 @@ extern const device_t * const devList[];
 extern const unsigned int devListSize;
 
 /*==================[external functions declaration]=========================*/
+
+/** @brief this function must be called from the system tick irq handler */
+void devListExecuteHandlers(void);
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */

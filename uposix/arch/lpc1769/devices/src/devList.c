@@ -87,9 +87,32 @@ const device_t * const devList[] =
  */
 const unsigned int devListSize = sizeof(devList)/sizeof(device_t *);
 
+/** @brief tick handler for device drivers
+ *  @note add your device driver tick handlers here
+ *  @warning must be non-blocking functions!
+ */
+const devTickHandler_t devHandlerList[] =
+{
+
+};
+
+/** @brief tick handler list size */
+const unsigned int devHandlerListSize = sizeof(devHandlerList)/sizeof(devTickHandler_t);
+
 /*==================[internal functions definition]==========================*/
 
 /*==================[external functions definition]==========================*/
+
+/** @brief this function must be called from the system tick irq handler */
+void devListExecuteHandlers(void)
+{
+	int i;
+
+	for(i=0; i<devHandlerListSize; i++)
+	{
+		devHandlerList[i]();
+	}
+}
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
