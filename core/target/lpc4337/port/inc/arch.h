@@ -66,12 +66,6 @@
 #endif
 #endif
 
-#include <cr_section_macros.h>
-
-#if defined (__CODE_RED)
-#include <NXP/crp.h>
-#endif
-
 #include "pthread.h"
 
 /*==================[cplusplus]==============================================*/

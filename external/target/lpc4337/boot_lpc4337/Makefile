@@ -6,7 +6,7 @@ LPROJECT  := lib$(PROJECT).a
 SRC_PATH  := ./src
 INC_PATH  := ./inc
 
-INCLUDES  := -I./inc
+INCLUDES  := -I./inc -I../lpc_chip_lpc43xx/inc -I../lpc_board_ngx_xplorer_4330/inc
 
 SRC_FILES := $(wildcard $(SRC_PATH)/*.c)
 INC_FILES := $(wildcard $(INC_PATH)/*.h)
@@ -20,6 +20,5 @@ $(LPROJECT): $(OBJ_FILES)
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	@echo "*** Compiling C file $< ***"
-	arm-none-eabi-gcc $(SYMBOLS) $(INCLUDES) $(CFLAGS) $< -o $@ 
+	arm-none-eabi-gcc $(SYMBOLS) $(INCLUDES) $(CFLAGS) $< -o $@
 	@echo ""
-

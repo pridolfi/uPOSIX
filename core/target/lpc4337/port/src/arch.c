@@ -70,13 +70,8 @@
 
 /*==================[internal data definition]===============================*/
 
-#if defined (__CODE_RED)
-/** @brief 	Variable to store CRP value in. Will be placed automatically
- * 			by the linker when "Enable Code Read Protect" selected.
- *			See crp.h header for more information.
- */
-__CRP const unsigned int CRP_WORD = CRP_NO_CRP ;
-#endif
+#define CRP_NO_CRP          0xFFFFFFFF
+__attribute__ ((used,section(".crp"))) const unsigned int CRP_WORD = CRP_NO_CRP ;
 
 static int arch_critical_section_nesting = 0;
 
