@@ -21,4 +21,5 @@ $(LPROJECT): $(OBJ_FILES)
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
 	@echo "*** Compiling C file $< ***"
 	arm-none-eabi-gcc $(SYMBOLS) $(INCLUDES) $(CFLAGS) $< -o $@
+	arm-none-eabi-gcc -MM $(SYMBOLS) $(INCLUDES) $(CFLAGS) $< > $(OBJ_PATH)/$*.d
 	@echo ""

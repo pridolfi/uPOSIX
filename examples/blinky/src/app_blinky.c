@@ -88,7 +88,7 @@ static int fd_systick;
 
 /** @brief #devGPIO_pin_t structure for LED control (port 0, bit 22).
  */
-static devGPIO_pin_t ledStick;
+static devGPIO_pin_t led;
 
 #if(USE_MUTEX)
 /** @brief mutex declaration */
@@ -149,7 +149,7 @@ void * thread_main(void * arg)
 		pthread_mutex_lock(&mutex);
 #endif
 		/* toggle led */
-		ioctl(fd_gpio, devGPIO_REQ_TOGGLE_BIT, &ledStick);
+		ioctl(fd_gpio, devGPIO_REQ_TOGGLE_BIT, &led);
 
 		cont++;
 		if(cont==10)
@@ -175,15 +175,16 @@ int main(void)
     fd_gpio = open("/dev/gpio", 0);
 
     /* Set pin structure with desired output */
-    ledStick = devGPIO_LPCXpresso1769_LED;
+	led.port = 0;
+	led.bit = 1;
 
     /* set output for P0.22 */
-    ledStick.value = 1;
-    ioctl(fd_gpio, devGPIO_REQ_WRITE_DIR, &ledStick);
+    led.value = 1;
+    ioctl(fd_gpio, devGPIO_REQ_WRITE_DIR, &led);
 
     /* P0.22 off */
-    ledStick.value = 0;
-    ioctl(fd_gpio, devGPIO_REQ_WRITE_BIT, &ledStick);
+    led.value = 0;
+    ioctl(fd_gpio, devGPIO_REQ_WRITE_BIT, &led);
 
 #if(USE_PIPES)
     /* create pipe */
