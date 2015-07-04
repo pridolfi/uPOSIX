@@ -7,8 +7,8 @@ export OBJ_PATH  := $(OUT_PATH)/obj
 
 ifeq ($(TARGET),lpc4337)
 export CFLAGS    := -Wall -ggdb3 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -c
-export SYMBOLS   := -DDEBUG -DCORE_M4 -D__USE_LPCOPEN -D__LPC43XX__ -D__CODE_RED -D__USE_UPOSIX_RTOS
-export LFLAGS    := -nostdlib -fno-builtin -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Xlinker -Map=$(OUT_PATH)/application.map
+export SYMBOLS   := -DDEBUG -DCORE_M4 -D__USE_LPCOPEN -D__LPC43XX__ -D__CODE_RED -D__USE_UPOSIX_RTOS -D__REDLIB__
+export LFLAGS    := -nostdlib -fno-builtin -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 endif
 
 TARGET_LIB := $(wildcard $(ROOT_PATH)/external/target/$(TARGET)/*)

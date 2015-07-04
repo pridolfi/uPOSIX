@@ -100,6 +100,8 @@ void arch_critical_section_end(void);
 
 void arch_check_stack_overflow(uint32_t * sp);
 
+extern void PendSV_Handler(void);
+
 #endif
 
 /*==================[cplusplus]==============================================*/

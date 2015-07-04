@@ -25,9 +25,11 @@ INC_FILES := $(wildcard $(INC_PATH)/*.h)
 OBJ_FILES := $(subst $(SRC_PATH),$(OBJ_PATH),$(SRC_FILES:.c=.o))
 OBJ_FILES += $(subst $(SRC_PATH),$(OBJ_PATH),$(ASM_FILES:.S=.o))
 
+MAP_FILE := -Xlinker -Map=$(OUT_PATH)/$(PROJECT).map
+
 $(PROJECT): $(OBJ_FILES)
 	@echo "*** Linking project $(PROJECT) ***"
-	arm-none-eabi-gcc $(LIB_PATH) $(LFLAGS) $(LD_FILE) -o $(OUT_PATH)/$(PROJECT).axf $(OBJ_FILES) $(LIBS)
+	arm-none-eabi-gcc $(LIB_PATH) $(LFLAGS) $(MAP_FILE) $(LD_FILE) -o $(OUT_PATH)/$(PROJECT).axf $(OBJ_FILES) $(LIBS)
 	arm-none-eabi-size $(OUT_PATH)/$(PROJECT).axf
 	arm-none-eabi-objcopy -v -O binary $(OUT_PATH)/$(PROJECT).axf $(OUT_PATH)/$(PROJECT).bin
 	@echo ""
