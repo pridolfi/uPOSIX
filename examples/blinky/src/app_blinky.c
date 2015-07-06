@@ -175,8 +175,8 @@ int main(void)
     fd_gpio = open("/dev/gpio", 0);
 
     /* Set pin structure with desired output */
-	led.port = 0;
-	led.bit = 1;
+	led.port = 5;
+	led.bit = 0;
 
     /* set output for P0.22 */
     led.value = 1;

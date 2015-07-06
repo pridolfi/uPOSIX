@@ -1,4 +1,4 @@
-export PROJECT		  := blinky
+export PROJECT		:= blinky
 export PROJECT_PATH := examples/$(PROJECT)
 export TARGET       := lpc4337
 

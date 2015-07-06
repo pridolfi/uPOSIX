@@ -26,6 +26,7 @@
 .metadata
 .project
 .cproject
+.settings
 
 #Backup files
 *~
