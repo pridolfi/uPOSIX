@@ -45,9 +45,9 @@ OBJ_FILES += $(addprefix $(OBJ_PATH)/,$(notdir $(ASM_FILES:.S=.o)))
 
 MAP_FILE := -Xlinker -Map=$(OUT_PATH)/map.map
 
-LD_FILE  := -Texternal/target/$(TARGET)/ld/$(TARGET)_lib.ld
-LD_FILE  += -Texternal/target/$(TARGET)/ld/$(TARGET)_mem.ld
-LD_FILE  += -Texternal/target/$(TARGET)/ld/$(TARGET).ld
+LD_FILE  := -Tconfig/$(TARGET)/ld/$(TARGET)_lib.ld
+LD_FILE  += -Tconfig/$(TARGET)/ld/$(TARGET)_mem.ld
+LD_FILE  += -Tconfig/$(TARGET)/ld/$(TARGET).ld
 
 %.o: %.c
 	@echo "*** Compiling C file $< ***"

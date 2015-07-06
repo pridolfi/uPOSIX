@@ -24,6 +24,8 @@
 
 #Eclipse files
 .metadata
+.project
+.cproject
 
 #Backup files
 *~
