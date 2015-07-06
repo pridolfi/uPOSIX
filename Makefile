@@ -1,7 +1,8 @@
 export APPLICATION := examples/blinky
 export TARGET      := lpc4337
 
-export ROOT_PATH := $(shell pwd)
+#export ROOT_PATH := $(shell pwd)
+export ROOT_PATH := .
 export OUT_PATH  := $(ROOT_PATH)/out
 export OBJ_PATH  := $(OUT_PATH)/obj
 
@@ -13,21 +14,22 @@ endif
 
 TARGET_LIB := $(wildcard $(ROOT_PATH)/external/target/$(TARGET)/*)
 
-all:
-	@echo "*** Building TLSF library ***"
-	make -C ./external/tlsf
+SRC_FILES := $(wildcard $(ROOT_PATH)/external/tlsf/src/*.c)
+SRC_FILES += $(foreach dir, $(TARGET_LIB), $(wildcard $(dir)/src/*.c))
+SRC_FILES += $(wildcard $(ROOT_PATH)/core/target/$(TARGET)/drivers/src/*.c)
+SRC_FILES += $(wildcard $(ROOT_PATH)/core/target/$(TARGET)/port/src/*.c)
+SRC_FILES += $(wildcard $(ROOT_PATH)/core/uposix/src/*.c)
 
-	@for PROJECT in $(TARGET_LIB) ; do \
-			echo "*** Building external target library $$PROJECT ***" ; \
-			make -C $$PROJECT ; \
-			echo "" ; \
-	done
+OBJ_FILES := $(addprefix $(OBJ_PATH)/,$(notdir $(SRC_FILES:.c=.o)))
 
-	@echo "*** Building main uPOSIX library ***"
-	make -C ./core
+all: $(notdir $(OBJ_FILES))
+	@echo $(SRC_FILES)
+	@echo ""
+	@echo $(OBJ_FILES)
 
-	@echo "*** Building and linking application ***"
-	make -C ./$(APPLICATION)
+$(OBJ_PATH)/%.o: %.c
+	@echo "*** Compiling C file $< ***"
+	@echo ""
 
 clean:
 	rm -f $(OBJ_PATH)/*.*
