@@ -38,9 +38,9 @@
 /** \addtogroup LPC4337	LPC4337 Port
  ** @{ */
 /** \addtogroup Template Template
- * 	devTemplate.c and devTemplate.h are template files you can use to define your own
- * 	peripheral driver. You need to replace <b>devTemplate</b> with your device name,
- * 	for example <b>devUART</b> or <b>devSPI</b>.
+ * 	devTemplate.c and devTemplate.h are template files you can use to define
+ * 	your own peripheral driver. You need to replace <b>devTemplate</b> with
+ * 	your device name, for example <b>devUART</b> or <b>devSPI</b>.
  ** @{ */
 
 /*
@@ -80,9 +80,15 @@ static int devGPIO_ioctl(const device_t * const dev, int req, void * param);
  */
 static uint32_t devGPIO_portNum = 0;
 
-static devGPIO_pin_t inputs[4] = { {0,4,0},{0,8,0},{0,9,0},{1,9,0} };
+static devGPIO_pin_t inputs[devGPIO_MAX_INPUTS] =
+{
+	{0,4,0},{0,8,0},{0,9,0},{1,9,0}
+};
 
-static devGPIO_pin_t outputs[6] = { {5,0,0},{5,1,0},{5,2,0},{0,14,0},{1,11,0},{1,12,0} };
+static devGPIO_pin_t outputs[devGPIO_MAX_OUTPUTS] =
+{
+	{5,0,0},{5,1,0},{5,2,0},{0,14,0},{1,11,0},{1,12,0}
+};
 
 /*==================[external data definition]===============================*/
 

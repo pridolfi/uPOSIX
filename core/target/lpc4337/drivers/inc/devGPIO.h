@@ -64,6 +64,9 @@
 
 /*==================[macros]=================================================*/
 
+#define devGPIO_MAX_INPUTS		4
+#define devGPIO_MAX_OUTPUTS	6
+
 /*==================[typedef]================================================*/
 
 /**
@@ -100,8 +103,8 @@ extern const device_t devGPIO;
 /*==================[external functions declaration]=========================*/
 
 /*
- * NOTE: You shouldn't need to define any external function. You have to use the
- * standard functions pointed by your device_t structure.
+ * NOTE: You shouldn't need to define any external function. You have to use
+ * the standard functions pointed by your device_t structure.
  */
 
 /** @} doxygen end group definition */
