@@ -47,6 +47,7 @@ ROOT_PATH := .
 OUT_PATH  := out
 OBJ_PATH  := $(OUT_PATH)/obj
 
+# Compiler flags, defined Symbols and Linker flags, target dependent
 ifeq ($(TARGET),lpc4337)
 CFLAGS  := -Wall -ggdb3 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -c
 SYMBOLS := -DDEBUG -DCORE_M4 -D__USE_LPCOPEN -D__LPC43XX__ -D__CODE_RED -D__USE_UPOSIX_RTOS
