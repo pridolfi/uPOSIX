@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # Project location, relative to uPOSIX path.
-PROJECT		 := examples/blinky
+PROJECT := examples/blinky
 
 # Target processor:
 # +---------+-----------------------------------------------------------------+
@@ -39,7 +39,7 @@ PROJECT		 := examples/blinky
 # +---------+-----------------------------------------------------------------+
 # | lpc4337 |  NXP LPC4337 Cortex-M4/M0 dual-core microcontroller.            |
 # +---------+-----------------------------------------------------------------+
-TARGET       := lpc1769
+TARGET := lpc1769
 
 # Internal variables, do not modify! Or modify carefully :-)
 PROJECT_NAME := $(notdir $(PROJECT))
