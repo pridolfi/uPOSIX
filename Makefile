@@ -39,7 +39,7 @@ PROJECT := examples/blinky
 # +---------+-----------------------------------------------------------------+
 # | lpc4337 |  NXP LPC4337 Cortex-M4/M0 dual-core microcontroller.            |
 # +---------+-----------------------------------------------------------------+
-TARGET := lpc1769
+TARGET := lpc4337
 
 # Internal variables, do not modify! Or modify carefully :-)
 PROJECT_NAME := $(notdir $(PROJECT))
@@ -101,6 +101,9 @@ ASM_FILES := $(foreach dir, $(SRC_PATH), $(wildcard $(dir)/*.S))
 OBJ_FILES := $(addprefix $(OBJ_PATH)/,$(notdir $(C_FILES:.c=.o)))
 OBJ_FILES += $(addprefix $(OBJ_PATH)/,$(notdir $(ASM_FILES:.S=.o)))
 
+# Get object file list without path (for dependencies)
+OBJS := $(notdir $(OBJ_FILES))
+
 # Map file output for link step
 MAP_FILE := -Xlinker -Map=$(OUT_PATH)/$(PROJECT_NAME).map
 
@@ -125,7 +128,7 @@ LD_FILE  += -Tconfig/$(TARGET)/ld/$(TARGET).ld
 all: $(PROJECT_NAME)
 
 # Link rule
-$(PROJECT_NAME): $(notdir $(OBJ_FILES))
+$(PROJECT_NAME): $(OBJS)
 	@echo "*** Linking $@ ***"
 	arm-none-eabi-gcc $(LIB_PATH) $(LFLAGS) $(MAP_FILE) $(LD_FILE) -o $(OUT_PATH)/$(PROJECT_NAME).axf $(OBJ_FILES) $(LIBS)
 	arm-none-eabi-size $(OUT_PATH)/$(PROJECT_NAME).axf
