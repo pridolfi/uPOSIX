@@ -148,7 +148,7 @@ info:
 	@echo ""
 	@echo SRC_FILES: $(SRC_FILES)
 	@echo ""
-	@echo OBJ_FILES: $(OBJ_FILES
+	@echo OBJ_FILES: $(OBJ_FILES)
 
 ###############################################################################
 # END OF MAKEFILE                                                             #
