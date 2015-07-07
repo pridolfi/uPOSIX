@@ -135,13 +135,13 @@ static int devGPIO_open(const device_t * const dev, int flags)
    Chip_SCU_PinMux(2,11,MD_PUP,FUNC0); /* GPIO1[11], LED2 */
    Chip_SCU_PinMux(2,12,MD_PUP,FUNC0); /* GPIO1[12], LED3 */
 
-   Chip_GPIO_SetDir(LPC_GPIO_PORT, 5,(1<<0)|(1<<1)|(1<<2),1);
-   Chip_GPIO_SetDir(LPC_GPIO_PORT, 0,(1<<14),1);
-   Chip_GPIO_SetDir(LPC_GPIO_PORT, 1,(1<<11)|(1<<12),1);
+   Chip_GPIO_SetDir(dev->ptr, 5,(1<<0)|(1<<1)|(1<<2),1);
+   Chip_GPIO_SetDir(dev->ptr, 0,(1<<14),1);
+   Chip_GPIO_SetDir(dev->ptr, 1,(1<<11)|(1<<12),1);
 
-   Chip_GPIO_ClearValue(LPC_GPIO_PORT, 5,(1<<0)|(1<<1)|(1<<2));
-   Chip_GPIO_ClearValue(LPC_GPIO_PORT, 0,(1<<14));
-   Chip_GPIO_ClearValue(LPC_GPIO_PORT, 1,(1<<11)|(1<<12));
+   Chip_GPIO_ClearValue(dev->ptr, 5,(1<<0)|(1<<1)|(1<<2));
+   Chip_GPIO_ClearValue(dev->ptr, 0,(1<<14));
+   Chip_GPIO_ClearValue(dev->ptr, 1,(1<<11)|(1<<12));
 
    /* Switches */
    Chip_SCU_PinMux(1,0,MD_PUP|MD_EZI|MD_ZI,FUNC0); /* GPIO0[4], SW1 */
@@ -149,8 +149,8 @@ static int devGPIO_open(const device_t * const dev, int flags)
    Chip_SCU_PinMux(1,2,MD_PUP|MD_EZI|MD_ZI,FUNC0); /* GPIO0[9], SW3 */
    Chip_SCU_PinMux(1,6,MD_PUP|MD_EZI|MD_ZI,FUNC0); /* GPIO1[9], SW4 */
 
-   Chip_GPIO_SetDir(LPC_GPIO_PORT, 0,(1<<4)|(1<<8)|(1<<9),0);
-   Chip_GPIO_SetDir(LPC_GPIO_PORT, 1,(1<<9),0);
+   Chip_GPIO_SetDir(dev->ptr, 0,(1<<4)|(1<<8)|(1<<9),0);
+   Chip_GPIO_SetDir(dev->ptr, 1,(1<<9),0);
 
 	return 0;
 }

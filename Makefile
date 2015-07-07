@@ -39,7 +39,7 @@ PROJECT := examples/blinky
 # +---------+-----------------------------------------------------------------+
 # | lpc4337 |  NXP LPC4337 Cortex-M4/M0 dual-core microcontroller.            |
 # +---------+-----------------------------------------------------------------+
-TARGET := lpc4337
+TARGET := lpc1769
 
 # Internal variables, do not modify! Or modify carefully :-)
 PROJECT_NAME := $(notdir $(PROJECT))
@@ -139,6 +139,11 @@ $(PROJECT_NAME): $(OBJS)
 clean:
 	rm -f $(OBJ_PATH)/*.*
 	rm -f $(OUT_PATH)/*.*
+
+# Download rule using openocd
+download:
+	@echo "*** Downloading $(OUT_PATH)/$(PROJECT_NAME).bin to target $(TARGET) ***"
+	openocd -f config/$(TARGET)/openocd/$(TARGET).cfg  -c "init" -c "halt 0" -c "flash write_image erase unlock $(OUT_PATH)/$(PROJECT_NAME).bin 0x1A000000 bin" -c "reset run" -c "exit"
 
 # Info rule for displaying some variables
 info:
