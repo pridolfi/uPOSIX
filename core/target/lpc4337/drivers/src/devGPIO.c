@@ -75,19 +75,14 @@ static int devGPIO_ioctl(const device_t * const dev, int req, void * param);
 
 /*==================[internal data definition]===============================*/
 
-/**
- * @brief Store the current port number used in read and write functions.
- */
-static uint32_t devGPIO_portNum = 0;
-
-static devGPIO_pin_t inputs[devGPIO_MAX_INPUTS] =
+static devGPIO_pinPort_t inputs[devGPIO_MAX_INPUTS] =
 {
-	{0,4,0},{0,8,0},{0,9,0},{1,9,0}
+	{0,4},{0,8},{0,9},{1,9}
 };
 
-static devGPIO_pin_t outputs[devGPIO_MAX_OUTPUTS] =
+static devGPIO_pinPort_t outputs[devGPIO_MAX_OUTPUTS] =
 {
-	{5,0,0},{5,1,0},{5,2,0},{0,14,0},{1,11,0},{1,12,0}
+	{5,0},{5,1},{5,2},{0,14},{1,11},{1,12}
 };
 
 /*==================[external data definition]===============================*/
@@ -155,49 +150,24 @@ static int devGPIO_open(const device_t * const dev, int flags)
 	return 0;
 }
 
-/** @brief 	This function reads GPIO ports (Ports 0 through len -max 4-).
- *
- * @param dev	Device structure.
- * @param buf	Buffer where port data will be stored.
- * @param len	Max port to read (0 through 4).
- * @return 		Number of bytes actually read, normally len, or -1 in case of an error.
- *
+/** @brief 	This function reads GPIO ports
  */
 static int devGPIO_read(const device_t * const dev, void * buf, int len)
 {
 	int rv = -1;
-	int i;
 
-	if((len <= 4)&&(dev->ptr==LPC_GPIO_PORT))
-	{
-		for(i=0; i<=len; i++)
-		{
-			((uint32_t*)buf)[i] = Chip_GPIO_ReadValue(dev->ptr, i);
-		}
-		rv = len;
-	}
+	/* TODO: implement this function! */
 
 	return rv;
 }
 
-/** @brief 	This function writes an entire GPIO port. Use ioctl #devGPIO_REQ_SET_PORT
- * 			to select the port to be read. Port 0 is selected by default.
- *
- * @param dev	Device structure.
- * @param buf	Buffer pointing to the data to be written.
- * @param len	Buffer length, should be 4 bytes (32 bits).
- * @return 		Number of bytes actually written (4 bytes) or -1 in case of an error.
- *
+/** @brief 	This function writes an entire GPIO port
  */
 static int devGPIO_write(const device_t * const dev, const void * buf, int len)
 {
 	int rv = -1;
 
-	if((len >= sizeof(uint32_t))&&(dev->ptr==LPC_GPIO_PORT))
-	{
-		Chip_GPIO_SetPortValue(dev->ptr, devGPIO_portNum, *((uint32_t *)buf));
-		rv = sizeof(uint32_t);
-	}
+	/* TODO: implement this function! */
 
 	return rv;
 }
@@ -245,14 +215,14 @@ static int devGPIO_close(const device_t * const dev)
 static int devGPIO_ioctl(const device_t * const dev, int req, void * param)
 {
 	int rv = -1;
-	devGPIO_pin_t * pin = (devGPIO_pin_t *)param;
+	devGPIO_pinValue_t * p = (devGPIO_pin_t *)param;
 
 	if(LPC_GPIO_PORT == dev->ptr)
 	{
 		switch(req)
 		{
 			case devGPIO_REQ_READ_BIT:
-				pin->value = Chip_GPIO_GetPinState(dev->ptr, pin->port, pin->bit);
+				pin->value = Chip_GPIO_GetPinState(dev->ptr, p->pin, p->value);
 				rv = 0;
 				break;
 

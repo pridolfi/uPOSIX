@@ -22,15 +22,17 @@
 *.x86_64
 *.hex
 
-#Eclipse files
+# Eclipse files
 .metadata
 .project
 .cproject
 .settings
 
-#Backup files
+# Backup files
 *~
 
-#User projects
+# User projects
 projects/
 
+# LPCXpresso files
+*.launch
