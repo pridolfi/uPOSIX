@@ -109,6 +109,9 @@ const device_t devGPIO =
 		&devGPIO_fops			/**< file operations */
 };
 
+const devGPIO_pin_t devGPIO_EDUCIAA_LED_RED   = {5, 0, 1};
+const devGPIO_pin_t devGPIO_EDUCIAA_LED_GREEN = {5, 1, 1};
+const devGPIO_pin_t devGPIO_EDUCIAA_LED_BLUE  = {5, 2, 1};
 
 /*==================[internal functions definition]==========================*/
 
@@ -215,7 +218,7 @@ static int devGPIO_close(const device_t * const dev)
 static int devGPIO_ioctl(const device_t * const dev, int req, void * param)
 {
 	int rv = -1;
-	devGPIO_pinValue_t * p = (devGPIO_pin_t *)param;
+	devGPIO_pinValue_t * p = (devGPIO_pinValue_t *)param;
 
 	if(LPC_GPIO_PORT == dev->ptr)
 	{

@@ -89,7 +89,6 @@ typedef enum
 		devGPIO_REQ_WRITE_BIT,	/**< Write a single bit. */
 		devGPIO_REQ_TOGGLE_BIT,	/**< Toggle a single bit. */
 		devGPIO_REQ_WRITE_DIR,	/**< Set direction for a single pin. */
-		devGPIO_REQ_SET_PORT,	/**< Set current port to read/write. */
 		devGPIO_REQ_SET_FUNC	/**< Set pin function. */
 }devGPIO_ioctl_requests;
 
@@ -97,31 +96,11 @@ typedef enum
 
 extern const device_t devGPIO;
 
-/* LPCXpresso LPC1769 Stick */
-extern const devGPIO_pin_t devGPIO_LPCXpresso1769_LED;
+/* Pins */
+extern const devGPIO_pin_t devGPIO_pins[];
 
-/* RubenBoard 2 (red) */
-/* Outputs */
-extern const devGPIO_pin_t devGPIO_RubenBoardRed_LED_BLUE;
-extern const devGPIO_pin_t devGPIO_RubenBoardRed_LED_GREEN;
-extern const devGPIO_pin_t devGPIO_RubenBoardRed_LED_RED;
-/* Inputs */
-extern const devGPIO_pin_t devGPIO_RubenBoardRed_SW2;
-extern const devGPIO_pin_t devGPIO_RubenBoardRed_SW3;
-
-/* LPCXpresso BaseBoard rev. B */
-/* Inputs */
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_SW3;
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_SW4;
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_UP;
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_DOWN;
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_LEFT;
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_RIGHT;
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_PRESS;
-/* Outputs */
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_LED_RED;
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_LED_GREEN;
-extern const devGPIO_pin_t devGPIO_BaseBoardRevB_LED_BLUE;
+/* Number of pins */
+extern const uint32_t devGPIO_pins_count;
 
 /*==================[external functions declaration]=========================*/
 

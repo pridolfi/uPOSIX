@@ -70,11 +70,6 @@ static int devGPIO_ioctl(const device_t * const dev, int req, void * param);
 
 /*==================[internal data definition]===============================*/
 
-/**
- * @brief Store the current port number used in read and write functions.
- */
-static uint32_t devGPIO_portNum = 0;
-
 /*==================[external data definition]===============================*/
 
 /**
@@ -100,36 +95,32 @@ const device_t devGPIO =
 };
 
 /**
- * @defgroup devGPIOgroup1 Common GPIO
  * @brief Some #devGPIO_pin_t common pins for LPC1769 Stick, BaseBoard and RubenBoard.
- * @{ */
-/* LPCXpresso LPC1769 Stick */
-const devGPIO_pin_t devGPIO_LPCXpresso1769_LED		= {0, 22, 1};
+ */
+const devGPIO_pin_t devGPIO_pins[] =
+{
+	/* Outputs */
+	{0, 22, 1}, /* LPCXpresso Stick LED */
+	{2,  2, 1}, /* RubenBoard 2 (red) LED Blue */
+	{2,  4, 1}, /* RubenBoard 2 (red) LED Red */
+	{2,  3, 1}, /* RubenBoard 2 (red) LED Green */
+	{2,  0, 1}, /* LPCXpresso BaseBoard Rev. B LED Red */
+	{2,  1, 1}, /* LPCXpresso BaseBoard Rev. B LED Green */
+	{0, 26, 1}, /* LPCXpresso BaseBoard Rev. B LED Blue */
+	/* Inputs */
+	{0, 18, 0}, /* RubenBoard 2 (red) SW2 */
+	{0,  1, 0}, /* RubenBoard 2 (red) SW3 */
+	{2, 10, 0}, /* LPCXpresso BaseBoard Rev. B SW3 */
+	{1, 31, 0}, /* LPCXpresso BaseBoard Rev. B SW4 */
+	{2,  3, 0}, /* LPCXpresso BaseBoard Rev. B JOY UP */
+	{0, 15, 0}, /* LPCXpresso BaseBoard Rev. B JOY DOWN */
+	{2,  4, 0}, /* LPCXpresso BaseBoard Rev. B JOY LEFT */
+	{0, 16, 0}, /* LPCXpresso BaseBoard Rev. B JOY RIGHT */
+	{0, 17, 0}, /* LPCXpresso BaseBoard Rev. B JOY PRESS */
+};
 
-/* RubenBoard 2 (red) */
-/* Outputs */
-const devGPIO_pin_t devGPIO_RubenBoardRed_LED_BLUE 	= {2,  2, 1};
-const devGPIO_pin_t devGPIO_RubenBoardRed_LED_RED	= {2,  4, 1};
-const devGPIO_pin_t devGPIO_RubenBoardRed_LED_GREEN	= {2,  3, 1};
-/* Inputs */
-const devGPIO_pin_t devGPIO_RubenBoardRed_SW2		= {0, 18, 0};
-const devGPIO_pin_t devGPIO_RubenBoardRed_SW3		= {0,  1, 0};
-
-/* LPCXpresso BaseBoard rev. B */
-/* Inputs */
-const devGPIO_pin_t devGPIO_BaseBoardRevB_SW3		= {2, 10, 0};
-const devGPIO_pin_t devGPIO_BaseBoardRevB_SW4		= {1, 31, 0};
-const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_UP	= {2,  3, 0};
-const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_DOWN	= {0, 15, 0};
-const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_LEFT	= {2,  4, 0};
-const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_RIGHT	= {0, 16, 0};
-const devGPIO_pin_t devGPIO_BaseBoardRevB_JOY_PRESS	= {0, 17, 0};
-/* Outputs */
-const devGPIO_pin_t devGPIO_BaseBoardRevB_LED_RED 	= {2,  0, 1};
-const devGPIO_pin_t devGPIO_BaseBoardRevB_LED_GREEN	= {2,  1, 1};
-const devGPIO_pin_t devGPIO_BaseBoardRevB_LED_BLUE 	= {0, 26, 1};
-/** @} */
-
+/** @brief managed gpio pin count */
+const uint32_t devGPIO_pins_count = sizeof(devGPIO_pins)/sizeof(devGPIO_pin_t);
 
 /*==================[internal functions definition]==========================*/
 
@@ -141,9 +132,25 @@ const devGPIO_pin_t devGPIO_BaseBoardRevB_LED_BLUE 	= {0, 26, 1};
  */
 static int devGPIO_open(const device_t * const dev, int flags)
 {
-	Chip_GPIO_Init(LPC_GPIO);
+	uint32_t i;
+
+	Chip_GPIO_Init(dev->ptr);
 	Chip_IOCON_Init(LPC_IOCON);
 
+	for(i=0; i<devGPIO_pins_count; i++)
+	{
+		Chip_GPIO_WriteDirBit(dev->ptr,
+			devGPIO_pins[i].port,
+			devGPIO_pins[i].bit,
+			devGPIO_pins[i].value);
+		if(devGPIO_pins[i].value == 1)
+		{
+			Chip_GPIO_SetPinState(dev->ptr,
+				devGPIO_pins[i].port,
+				devGPIO_pins[i].bit,
+				0);
+		}
+	}
 	return 0;
 }
 
@@ -153,18 +160,19 @@ static int devGPIO_open(const device_t * const dev, int flags)
  * @param buf	Buffer where port data will be stored.
  * @param len	Max port to read (0 through 4).
  * @return 		Number of bytes actually read, normally len, or -1 in case of an error.
- *
  */
 static int devGPIO_read(const device_t * const dev, void * buf, int len)
 {
 	int rv = -1;
 	int i;
 
-	if((len <= 4)&&(dev->ptr == LPC_GPIO))
+	devGPIO_pin_t * p = (devGPIO_pin_t *)buf;
+
+	if((len <= devGPIO_pins_count)&&(dev->ptr == LPC_GPIO))
 	{
-		for(i=0; i<=len; i++)
+		for(i=0; i<len; i++)
 		{
-			((uint32_t*)buf)[i] = Chip_GPIO_ReadValue(dev->ptr, i);
+			p[i].value = Chip_GPIO_GetPinState(dev->ptr, p[i].port, p[i].bit);
 		}
 		rv = len;
 	}
@@ -184,11 +192,17 @@ static int devGPIO_read(const device_t * const dev, void * buf, int len)
 static int devGPIO_write(const device_t * const dev, const void * buf, int len)
 {
 	int rv = -1;
+	int i;
 
-	if((len >= sizeof(uint32_t))&&(dev->ptr == LPC_GPIO))
+	devGPIO_pin_t * p = (devGPIO_pin_t *)buf;
+
+	if((len <= devGPIO_pins_count)&&(dev->ptr == LPC_GPIO))
 	{
-		Chip_GPIO_SetPortValue(dev->ptr, devGPIO_portNum, *((uint32_t *)buf));
-		rv = sizeof(uint32_t);
+		for(i=0; i<len; i++)
+		{
+			Chip_GPIO_SetPinState(dev->ptr, p[i].port, p[i].bit, p[i].value);
+		}
+		rv = len;
 	}
 
 	return rv;
@@ -255,11 +269,6 @@ static int devGPIO_ioctl(const device_t * const dev, int req, void * param)
 
 			case devGPIO_REQ_WRITE_BIT:
 				Chip_GPIO_WritePortBit(LPC_GPIO, pin->port, pin->bit, pin->value);
-				rv = 0;
-				break;
-
-			case devGPIO_REQ_SET_PORT:
-				devGPIO_portNum = pin->port;
 				rv = 0;
 				break;
 

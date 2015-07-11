@@ -78,6 +78,8 @@ static void mySysTickCallback(void);
 
 /*==================[internal data definition]===============================*/
 
+static devGPIO_pin_t led;
+
 /** @brief File Descriptor for GPIO access.
  */
 static int fd_gpio;
@@ -85,10 +87,6 @@ static int fd_gpio;
 /** @brief File Descriptor for SysTick access.
  */
 static int fd_systick;
-
-/** @brief #devGPIO_pin_t structure for LED control (port 0, bit 22).
- */
-static devGPIO_pin_t led;
 
 #if(USE_MUTEX)
 /** @brief mutex declaration */
@@ -174,15 +172,8 @@ int main(void)
 	/* init GPIO, get descriptor */
     fd_gpio = open("/dev/gpio", 0);
 
-    /* Set pin structure with desired output */
-	led.port = 0;
-	led.bit = 22;
-
-    /* set output for P0.22 */
-    led.value = 1;
-    ioctl(fd_gpio, devGPIO_REQ_WRITE_DIR, &led);
-
-    /* P0.22 off */
+    /* LED off */
+    led = devGPIO_pins[0];
     led.value = 0;
     ioctl(fd_gpio, devGPIO_REQ_WRITE_BIT, &led);
 

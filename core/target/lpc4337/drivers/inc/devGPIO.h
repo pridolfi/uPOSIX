@@ -71,20 +71,17 @@
 /*==================[typedef]================================================*/
 
 /**
- * @brief This structure defines a port number and bit number to be used with
- * devGPIO functions.
+ * @brief This structure defines a port number, bit number and a value, to be
+ * used with devGPIO functions.
  */
 typedef struct
 {
+	/*@{*/
 	uint32_t port;	/**< Port number */
 	uint32_t bit;	/**< Bit number */
-}devGPIO_pinPort_t;
-
-typedef struct
-{
-	uint32_t pin;
-	uint32_t value;
-}devGPIO_pinValue_t;
+	uint32_t value;	/**< Value */
+	/*@}*/
+}devGPIO_pin_t;
 
 /**
  * @var	devGPIO_ioctl_requests
