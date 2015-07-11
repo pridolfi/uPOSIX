@@ -64,10 +64,6 @@
 
 /*==================[macros]=================================================*/
 
-#define devGPIO_MAX_INPUTS		4
-
-#define devGPIO_MAX_OUTPUTS	6
-
 /*==================[typedef]================================================*/
 
 /**
@@ -93,13 +89,19 @@ typedef enum
 		devGPIO_REQ_WRITE_BIT,	/**< Write a single bit. */
 		devGPIO_REQ_TOGGLE_BIT,	/**< Toggle a single bit. */
 		devGPIO_REQ_WRITE_DIR,	/**< Set direction for a single pin. */
-		devGPIO_REQ_SET_PORT,	/**< Set current port to read/write. */
 		devGPIO_REQ_SET_FUNC	/**< Set pin function. */
 }devGPIO_ioctl_requests;
 
 /*==================[external data declaration]==============================*/
 
 extern const device_t devGPIO;
+
+/* Pins */
+extern const devGPIO_pin_t devGPIO_pins[];
+
+/* Number of pins */
+extern const uint32_t devGPIO_pins_count;
+
 
 /*==================[external functions declaration]=========================*/
 

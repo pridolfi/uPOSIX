@@ -75,16 +75,6 @@ static int devGPIO_ioctl(const device_t * const dev, int req, void * param);
 
 /*==================[internal data definition]===============================*/
 
-static devGPIO_pinPort_t inputs[devGPIO_MAX_INPUTS] =
-{
-	{0,4},{0,8},{0,9},{1,9}
-};
-
-static devGPIO_pinPort_t outputs[devGPIO_MAX_OUTPUTS] =
-{
-	{5,0},{5,1},{5,2},{0,14},{1,11},{1,12}
-};
-
 /*==================[external data definition]===============================*/
 
 /**
@@ -109,9 +99,27 @@ const device_t devGPIO =
 		&devGPIO_fops			/**< file operations */
 };
 
-const devGPIO_pin_t devGPIO_EDUCIAA_LED_RED   = {5, 0, 1};
-const devGPIO_pin_t devGPIO_EDUCIAA_LED_GREEN = {5, 1, 1};
-const devGPIO_pin_t devGPIO_EDUCIAA_LED_BLUE  = {5, 2, 1};
+/**
+ * @brief Some #devGPIO_pin_t common pins for EDU-CIAA-NXP.
+ */
+const devGPIO_pin_t devGPIO_pins[] =
+{
+	/* Outputs */
+	{0, 14, 1}, /* EDU-CIAA-NXP LED1 */
+	{5,  2, 1}, /* EDU-CIAA-NXP LED Blue */
+	{5,  0, 1}, /* EDU-CIAA-NXP LED Red */
+	{5,  1, 1}, /* EDU-CIAA-NXP LED Green */
+	{1, 11, 1}, /* EDU-CIAA-NXP LED2 */
+	{1, 12, 1}, /* EDU-CIAA-NXP LED3 */
+	/* Inputs */
+	{0,  4, 0}, /* EDU-CIAA-NXP SW1 */
+	{0,  8, 0}, /* EDU-CIAA-NXP SW2 */
+	{0,  9, 0}, /* EDU-CIAA-NXP SW3 */
+	{1,  9, 0}, /* EDU-CIAA-NXP SW4 */
+};
+
+/** @brief managed gpio pin count */
+const uint32_t devGPIO_pins_count = sizeof(devGPIO_pins)/sizeof(devGPIO_pin_t);
 
 /*==================[internal functions definition]==========================*/
 
@@ -158,19 +166,39 @@ static int devGPIO_open(const device_t * const dev, int flags)
 static int devGPIO_read(const device_t * const dev, void * buf, int len)
 {
 	int rv = -1;
+	int i;
 
-	/* TODO: implement this function! */
+	devGPIO_pin_t * p = (devGPIO_pin_t *)buf;
+
+	if((len <= devGPIO_pins_count)&&(dev->ptr == LPC_GPIO_PORT))
+	{
+		for(i=0; i<len; i++)
+		{
+			p[i].value = Chip_GPIO_GetPinState(dev->ptr, p[i].port, p[i].bit);
+		}
+		rv = len;
+	}
 
 	return rv;
 }
 
-/** @brief 	This function writes an entire GPIO port
+/** @brief 	This function writes an array of devGPIOpin_t variables
  */
 static int devGPIO_write(const device_t * const dev, const void * buf, int len)
 {
 	int rv = -1;
+	int i;
 
-	/* TODO: implement this function! */
+	devGPIO_pin_t * p = (devGPIO_pin_t *)buf;
+
+	if((len <= devGPIO_pins_count)&&(dev->ptr == LPC_GPIO_PORT))
+	{
+		for(i=0; i<len; i++)
+		{
+			Chip_GPIO_SetPinState(dev->ptr, p[i].port, p[i].bit, p[i].value);
+		}
+		rv = len;
+	}
 
 	return rv;
 }
@@ -218,39 +246,34 @@ static int devGPIO_close(const device_t * const dev)
 static int devGPIO_ioctl(const device_t * const dev, int req, void * param)
 {
 	int rv = -1;
-	devGPIO_pinValue_t * p = (devGPIO_pinValue_t *)param;
+	devGPIO_pin_t * p = (devGPIO_pin_t *)param;
 
 	if(LPC_GPIO_PORT == dev->ptr)
 	{
 		switch(req)
 		{
 			case devGPIO_REQ_READ_BIT:
-				pin->value = Chip_GPIO_GetPinState(dev->ptr, p->pin, p->value);
+				p->value = Chip_GPIO_GetPinState(dev->ptr, p->port, p->bit);
 				rv = 0;
 				break;
 
 			case devGPIO_REQ_WRITE_BIT:
-				Chip_GPIO_WritePortBit(dev->ptr, pin->port, pin->bit, pin->value);
+				Chip_GPIO_WritePortBit(dev->ptr, p->port, p->bit, p->value);
 				rv = 0;
 				break;
 
 			case devGPIO_REQ_WRITE_DIR:
-				Chip_GPIO_WriteDirBit(dev->ptr, pin->port, pin->bit, pin->value);
-				rv = 0;
-				break;
-
-			case devGPIO_REQ_SET_PORT:
-				devGPIO_portNum = pin->port;
+				Chip_GPIO_WriteDirBit(dev->ptr, p->port, p->bit, p->value);
 				rv = 0;
 				break;
 
 			case devGPIO_REQ_TOGGLE_BIT:
-				Chip_GPIO_SetPinToggle(dev->ptr, pin->port, pin->bit);
+				Chip_GPIO_SetPinToggle(dev->ptr, p->port, p->bit);
 				rv = 0;
 				break;
 
 			case devGPIO_REQ_SET_FUNC:
-				Chip_SCU_PinMux(pin->port, pin->bit, pin->value & ~0x3, pin->value & 0x3);
+				Chip_SCU_PinMux(p->port, p->bit, p->value & ~0x3, p->value & 0x3);
 				rv = 0;
 				break;
 
