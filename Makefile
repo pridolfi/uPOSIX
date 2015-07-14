@@ -28,10 +28,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Project location, relative to uPOSIX path.
-PROJECT := examples/blinky
+# Include Makefile.mine with PROJECT and TARGET definitions.
+-include Makefile.mine
 
-# Target processor:
+# Project location, relative to uPOSIX path (default, to be defined in
+# Makefile.mine).
+PROJECT ?= examples/blinky
+
+# Target processor (default, to be defined in Makefile.mine):
 # +---------+-----------------------------------------------------------------+
 # | TARGET  |  Description                                                    |
 # +---------+-----------------------------------------------------------------+
@@ -39,7 +43,7 @@ PROJECT := examples/blinky
 # +---------+-----------------------------------------------------------------+
 # | lpc4337 |  NXP LPC4337 Cortex-M4/M0 dual-core microcontroller.            |
 # +---------+-----------------------------------------------------------------+
-TARGET := lpc1769
+TARGET ?= lpc1769
 
 # Internal variables, do not modify! Or modify carefully :-)
 PROJECT_NAME := $(notdir $(PROJECT))
@@ -154,6 +158,8 @@ info:
 	@echo SRC_FILES: $(SRC_FILES)
 	@echo ""
 	@echo OBJ_FILES: $(OBJ_FILES)
+	@echo ""
+	@echo MAKECMDGOALS: $(MAKECMDGOALS)
 
 ###############################################################################
 # END OF MAKEFILE                                                             #

@@ -36,3 +36,6 @@ projects/
 
 # LPCXpresso files
 *.launch
+
+# Makefile.mine
+Makefile.mine
