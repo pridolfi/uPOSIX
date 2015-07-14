@@ -49,14 +49,14 @@ OBJ_PATH  := $(OUT_PATH)/obj
 
 # Compiler flags, defined Symbols and Linker flags, target dependent
 ifeq ($(TARGET),lpc4337)
-CFLAGS  := -Wall -ggdb3 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -c
+CFLAGS  := -Wall -ggdb3 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -fdata-sections -ffunction-sections -c
 SYMBOLS := -DDEBUG -DCORE_M4 -D__USE_LPCOPEN -D__LPC43XX__ -D__CODE_RED -D__USE_UPOSIX_RTOS
-LFLAGS  := -nostdlib -fno-builtin -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
+LFLAGS  := -nostdlib -fno-builtin -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Wl,--gc-sections
 else
 ifeq ($(TARGET),lpc1769)
-CFLAGS  := -Wall -ggdb3 -mcpu=cortex-m3 -mthumb -c
+CFLAGS  := -Wall -ggdb3 -mcpu=cortex-m3 -mthumb -fdata-sections -ffunction-sections -c
 SYMBOLS := -DDEBUG -DCORE_M3 -D__USE_LPCOPEN -D__LPC17XX__ -D__CODE_RED -D__USE_UPOSIX_RTOS
-LFLAGS  := -nostdlib -fno-builtin -mcpu=cortex-m3 -mthumb
+LFLAGS  := -nostdlib -fno-builtin -mcpu=cortex-m3 -mthumb -Wl,--gc-sections
 else
 $(error Please define TARGET variable!)
 endif
