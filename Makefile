@@ -149,6 +149,11 @@ download:
 	@echo "*** Downloading $(OUT_PATH)/$(PROJECT_NAME).bin to target $(TARGET) ***"
 	openocd -f config/$(TARGET)/openocd/$(TARGET).cfg  -c "init" -c "halt 0" -c "flash write_image erase unlock $(OUT_PATH)/$(PROJECT_NAME).bin 0x1A000000 bin" -c "reset run" -c "exit"
 
+# Erase rule using openocd
+erase:
+	@echo "*** Erasing flash memory... ***"
+	openocd -f config/$(TARGET)/openocd/$(TARGET).cfg -c "init" -c "halt 0" -c "flash erase_sector 0 0 last" -c "exit"
+
 # Info rule for displaying some variables
 info:
 	@echo PROJECT_NAME: $(PROJECT_NAME)
