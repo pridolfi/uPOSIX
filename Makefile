@@ -56,11 +56,13 @@ ifeq ($(TARGET),lpc4337)
 CFLAGS  := -Wall -ggdb3 -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -fdata-sections -ffunction-sections -c
 SYMBOLS := -DDEBUG -DCORE_M4 -D__USE_LPCOPEN -D__LPC43XX__ -D__CODE_RED -D__USE_UPOSIX_RTOS
 LFLAGS  := -nostdlib -fno-builtin -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -Wl,--gc-sections
+CODE_ADDR := 0x1A000000
 else
 ifeq ($(TARGET),lpc1769)
 CFLAGS  := -Wall -ggdb3 -mcpu=cortex-m3 -mthumb -fdata-sections -ffunction-sections -c
 SYMBOLS := -DDEBUG -DCORE_M3 -D__USE_LPCOPEN -D__LPC17XX__ -D__CODE_RED -D__USE_UPOSIX_RTOS
 LFLAGS  := -nostdlib -fno-builtin -mcpu=cortex-m3 -mthumb -Wl,--gc-sections
+CODE_ADDR := 0x00000000
 else
 $(error Please define TARGET variable!)
 endif
@@ -145,9 +147,9 @@ clean:
 	rm -f $(OUT_PATH)/*.*
 
 # Download rule using openocd
-download:
+download: $(PROJECT_NAME)
 	@echo "*** Downloading $(OUT_PATH)/$(PROJECT_NAME).bin to target $(TARGET) ***"
-	openocd -f config/$(TARGET)/openocd/$(TARGET).cfg  -c "init" -c "halt 0" -c "flash write_image erase unlock $(OUT_PATH)/$(PROJECT_NAME).bin 0x1A000000 bin" -c "reset run" -c "exit"
+	openocd -f config/$(TARGET)/openocd/$(TARGET).cfg  -c "init" -c "halt 0" -c "flash write_image erase unlock $(OUT_PATH)/$(PROJECT_NAME).bin $(CODE_ADDR) bin" -c "reset run" -c "exit"
 
 # Erase rule using openocd
 erase:
@@ -160,7 +162,7 @@ info:
 	@echo ""
 	@echo SRC_PATH:  $(SRC_PATH)
 	@echo ""
-	@echo SRC_FILES: $(SRC_FILES)
+	@echo SRC_FILES: $(C_FILES) $(ASM_FILES)
 	@echo ""
 	@echo OBJ_FILES: $(OBJ_FILES)
 	@echo ""
